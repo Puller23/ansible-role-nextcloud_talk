@@ -30,7 +30,7 @@ http_listener_port: 8088
 http_listener_readtimeout: 15
 http_listener_writetimeout: 15
 
-# http listener
+# https listener
 https_listener_enabled: false
 https_listener_ip: "127.0.0.1"
 https_listener_port: 8443

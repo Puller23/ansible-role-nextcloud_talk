@@ -1,7 +1,7 @@
-Ansible Role: redis exporter
+Ansible Role: nextcloud talk
 =========
 
-Deploy prometheus [redis exporter](https://https://github.com/oliver006/redis_exporter) using ansible.
+Install nextcloud talk using ansible.
 
 Requirements
 ------------
@@ -15,17 +15,11 @@ All variables which can be overridden are stored in [defaults/main.yml](defaults
 
 | Name           | Default Value | Description                        |
 | -------------- | ------------- | -----------------------------------|
-| `redis_exporter_version` | 1.20.0 | Redis exporter package version. Also accepts latest as parameter. |
-| `redis_exporter_install_dir` | "" | Allows to use local packages instead of ones distributed on github.|
-| `redis_exporter_web_listen_adress` | "0.0.0.0:9312" | Address on which redis exporter will listen |
-| `redis_exporter_system_user` | "0.0.0.0:9312" | Address on which redis exporter will listen |
-| `redis_exporter_system_group` | "0.0.0.0:9312" | Address on which redis exporter will listen |
-| `redis_exporter_web_telemetry_path` | "metrics" | Path under which to expose metrics |
-| `redis_exporter_redis_ip` | "localhost" | IP Address of the Redis instance |
-| `redis_exporter_redis_port` | 6379 | Port of the Redis instance |
-| `redis_exporter_redis_password` | "" | Password of the Redis instance |
-| `redis_exporter_system_user` | "redis-exp" | User for systemd service |
-| `redis_exporter_system_group` | "redis-exp" | User for systemd service |
+| `hpb_customer_id` | "" | Credentials for HPB Download |
+| `hpb_proxy` | false | Set this value within the host_vars for the relevant hosts.|
+| `hpb_signaling` | false | Set this value within the host_vars for the relevant hosts |
+| `hpb_turnserver` | false | Set this value within the host_vars for the relevant hosts |
+| `turn_install_from_source` | false | Set thies to true, if you want to install coturn from source |
 
 
 Dependencies
@@ -40,7 +34,7 @@ Use it in a playbook as follows:
 ```yaml
 - hosts: all
   roles:
-    - puller23.redis_exporter
+    - puller23.nextcloud_talk
 ```
 
 License
