@@ -1,0 +1,42 @@
+---
+  - name: "[nginx] Ensure directory exists for SSL certs"
+    file:
+      path: "{{ nginx_ssl_folder }}"
+      state: directory
+
+  - name: "[nginx] Generate an OpenSSL private key."
+    openssl_privatekey:
+      path: "{{ nginx_ssl_folder }}/{{ hpb_ssl_cn }}.key"
+
+  - name: "[nginx] Generate an OpenSSL CSR."
+    openssl_csr:
+      path: /etc/ssl/private/{{ hpb_ssl_cn }}.csr
+      privatekey_path: "{{ nginx_ssl_folder }}/{{ hpb_ssl_cn }}.key"
+      common_name: "{{ hpb_ssl_cn }}"
+
+  - name: "[nginx] Generate a Self Signed OpenSSL certificate."
+    openssl_certificate:
+      path: "{{ nginx_ssl_folder }}/{{ hpb_ssl_cn }}.pem"
+      privatekey_path: "{{ nginx_ssl_folder }}/{{ hpb_ssl_cn }}.key"
+      csr_path: /etc/ssl/private/{{ hpb_ssl_cn }}.csr
+      provider: selfsigned
+
+  # - name: "[nginx] Copy configuration in place."
+  #   template:
+  #     src: "{{ nc_spreed_proxy_nginx_template }}"
+  #     dest: "{{ nginx_sites_available_path }}/{{ nginx_site_conf_filename }}"
+  #     mode: 0644
+  #   notify: restart nginx
+
+  - name: "[Proxy] Ensure directory exists for signaling keys"
+    file:
+      path: "{{ nc_spreed_proxy_conf_path }}/keys"
+      state: directory
+      mode: 0777
+
+  - name: "[Proxy] Copy nextcloud_spreed_signaling_proxy configuration in place."
+    template:
+      src: "{{ nc_spreed_proxy_template }}"
+      dest: "{{ nc_spreed_proxy_conf_path }}/{{ nc_spreed_proxy_conf_filename }}"
+      mode: 0644
+    notify: restart nextcloud-spreed-signaling-proxy

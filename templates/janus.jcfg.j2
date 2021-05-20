@@ -1,0 +1,57 @@
+# {{ansible_managed}}
+
+general: {
+    configs_folder = "/etc/janus"            # Configuration files folder
+    plugins_folder = "/usr/lib/x86_64-linux-gnu/janus/plugins"          # Plugins folder
+    transports_folder = "/usr/lib/x86_64-linux-gnu/janus/transports"    # Transports folder
+    events_folder = "/usr/lib/x86_64-linux-gnu/janus/events"            # Event handlers folder
+    loggers_folder = "/usr/lib/x86_64-linux-gnu/janus/loggers"          # External loggers folder
+    debug_level = 4                         # Debug/logging level, valid values are 0-7
+    admin_secret = "janusoverlord"  # String that all Janus requests must contain
+    protected_folders = [
+        "/bin",
+        "/boot",
+        "/dev",
+        "/etc",
+        "/initrd",
+        "/lib",
+        "/lib32",
+        "/lib64",
+        "/proc",
+        "/sbin",
+        "/sys",
+        "/usr",
+        "/var",
+        "/opt/janus/bin",
+        "/opt/janus/etc",
+        "/opt/janus/include",
+        "/opt/janus/lib",
+        "/opt/janus/lib32",
+        "/opt/janus/lib64",
+        "/opt/janus/sbin"
+    ]
+}
+certificates: {
+    cert_pem = "{{ janus_certificates_cert_pem }}"
+    cert_key = "{{ janus_certificates_cert_key }}";
+}
+media: {
+    rtp_port_range = "{{ janus_rtp_port_range }}"
+}
+nat: {
+    stun_server = "{{ janus_stun_server }}";
+    stun_port = {{ janus_stun_server_port }}
+    nice_debug = false
+    ice_ignore_list = "vmnet,docker";
+}
+plugins: {
+    disable = "libjanus_audiobridge.so,libjanus_echotest.so,libjanus_lua.so,libjanus_nosip.so,libjanus_recordplay.so,libjanus_sip.so,libjanus_sipre.so,libjanus_streaming.so,libjanus_textroom.so,libjanus_videocall.so,libjanus_voicemail.so";
+}
+transports: {
+    disable = "libjanus_http.so,libjanus_pfunix.so,libjanus_rabbitmq.so";
+}
+loggers: {
+}
+events: {
+    disable = "libjanus_sampleevh.so";
+}

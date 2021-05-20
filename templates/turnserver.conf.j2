@@ -1,0 +1,39 @@
+# {{ansible_managed}}
+{% if turn_tls_cert | length > 0 and turn_tls_pkey | length > 0 %}
+tls-listening-port={{turn_tls_listening_port }}
+cert={{ turn_tls_cert }}
+pkey={{ turn_tls_pkey }}
+{% else %}
+listening-port={{ turn_listening_port }}
+{% endif %}
+{% if turn_listening_device != '' %}
+listening-device={{turn_listening_device }}
+{% endif %}
+fingerprint
+#lt-cred-mech
+use-auth-secret
+static-auth-secret={{ turn_static_auth_secret }}
+realm={{ turn_realm }}
+total-quota={{ turn_total_quota }}
+bps-capacity={{ turn_bps_capacity }}
+stale-nonce={{ turn_stale_nonce }}
+{% if turn_no_loopback_peers %}
+no-loopback-peers
+{% endif %}
+{% if turn_no_multicast_peers %}
+no-multicast-peers
+{% endif %}
+{% for listening_ip in turn_listening_ip %}
+listening-ip={{listening_ip}}
+{% endfor %}
+{% if turn_prometheus %}
+prometheus
+{% endif %}
+{% if turn_external_ip %}
+external-ip={{ turn_external_ip }}
+{% endif %}
+{% if turn_extra_parameters is defined %}
+{% for turn_extra_parameter in turn_extra_parameters %}
+{{turn_extra_parameter}}
+{% endfor %}
+{% endif %}

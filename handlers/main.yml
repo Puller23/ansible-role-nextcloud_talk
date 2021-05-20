@@ -1,0 +1,20 @@
+---
+- name: restart nextcloud-spreed-signaling
+  service:
+    name: "{{ nextcloud_spreed_signaling_service }}"
+    state: "{{ nextcloud_spreed_signaling_restart_state }}"
+
+- name: restart nextcloud-spreed-signaling-proxy
+  service:
+    name: "{{ nc_spreed_proxy_service }}"
+    state: "{{ nc_spreed_proxy_restart_state }}"
+
+- name: restart turnserver
+  service:
+    name: "{{ turn_service }}"
+    state: "{{ turn_service_restart_state }}"
+
+- name: restart janus
+  service:
+    name: "{{ janus_service }}"
+    state: "{{ janus_restart_state }}"

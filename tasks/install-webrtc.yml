@@ -1,0 +1,31 @@
+---
+  - name: Import the hpb repo key
+    apt_key:
+      url: "{{ hpb_apt_key }}"
+      state: present
+
+  - name: Install hpb repo
+    apt_repository:
+      repo: "{{ hpb_repo }}"
+      filename: nextcloud-spreed-repository
+      state: present
+
+  - name: Make sure universe repository is enabled
+    apt_repository:
+      repo: deb http://archive.ubuntu.com/ubuntu focal universe
+      state: present
+
+  - name: Update apt-get repo and cache
+    apt:
+      update_cache: yes
+      cache_valid_time: 3600
+
+  # - name: Install nginx
+  #   apt:
+  #     name: nginx
+  #     state: latest
+      
+  - name: Install nextcloud-spreed-services-proxy
+    apt:
+      name: nextcloud-spreed-services-proxy
+      state: latest

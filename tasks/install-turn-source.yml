@@ -1,0 +1,147 @@
+---
+- name: Assert the usage of Ubuntu
+  assert:
+    that: ansible_distribution == 'Ubuntu'
+    msg: "This role only works with Ubuntu"
+
+- name: Create the turnserver group
+  group:
+    name: "{{ turn_source_system_group }}"
+    state: present
+    system: true
+  when: turn_source_system_group != "root"
+
+- name: Create the turnserver user
+  user:
+    name: "{{ turn_source_system_user }}"
+    groups: "{{ turn_source_system_group }}"
+    append: true
+    shell: /usr/sbin/nologin
+    create_home: false
+    home: /
+  when: turn_source_system_user != "root"
+
+- name: "[turn source] Ensure dependencies for building from source are installed (Debian)."
+  package:
+    name: 
+      - build-essential 
+      - libssl-dev 
+      - libevent-dev 
+      - pkg-config
+      - sqlite3
+      - libsqlite3-dev
+      - libevent-dev
+      - libpq-dev
+      - mysql-client
+      - libmysqlclient-dev
+      - libhiredis-dev
+
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: "[turn source] Update apt-get repo and cache"
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: "[turn source] Check if coturn binary exists."
+  stat:
+    path: "{{ turn_source_bin_dir }}/turnserver"
+  register: coturn_binary_is_installed
+  check_mode: false
+
+
+- name: "[turn source] Check if coturn is installed by package manager."
+  command: which turnserver
+  changed_when: false
+  failed_when: false
+  register: coturn_is_installed
+
+
+- block:
+    - name: "[turn source] Get prometheus client lib libprom-dev"
+      become: false
+      get_url:
+        url: "{{ turn_source_prometheus_client_url }}/v{{ turn_source_prometheus_client_version }}/libprom-dev-{{ turn_source_prometheus_client_version }}-Linux.deb"
+        dest: "{{ turn_source_clone_dir }}/libprom.deb"
+        mode: '0644'
+      register: _r_download_binary_libprom
+      until: _r_download_binary_libprom is succeeded
+      retries: 5
+      delay: 2
+
+    - name: "[turn source] Get prometheus client lib libpromhttp"
+      become: false
+      get_url:
+        url: "{{ turn_source_prometheus_client_url }}/v{{ turn_source_prometheus_client_version }}/libpromhttp-dev-{{ turn_source_prometheus_client_version }}-Linux.deb"
+        dest: "{{ turn_source_clone_dir }}/libpromhttp.deb"
+        mode: '0644'
+      register: _r_download_binary_libpromhttp
+      until: _r_download_binary_libpromhttp is succeeded
+      retries: 5
+      delay: 2
+
+    - name: "[turn source] Install libprom package"
+      apt:
+        deb: "{{ turn_source_clone_dir }}/libprom.deb"
+
+    - name: "[turn source] Install libpromhttp package"
+      apt:
+        deb: "{{ turn_source_clone_dir }}/libpromhttp.deb"
+
+    - name: "[turn source] Get current coturn tar"
+      become: false
+      get_url:
+        url: "{{ turn_source_url }}/{{ turn_source_version }}.tar.gz"
+        dest: "{{ turn_source_clone_dir }}/{{ turn_source_version }}.tar.gz"
+        mode: '0644'
+      register: _r_download_binary_libpromhttp
+      until: _r_download_binary_libpromhttp is succeeded
+      retries: 5
+      delay: 2
+
+    - name: Unarchive coturn tar
+      become: false
+      unarchive:
+        src: "{{ turn_source_clone_dir }}/{{ turn_source_version }}.tar.gz"
+        dest: "/{{ turn_source_clone_dir }}"
+        creates: "{{ turn_source_clone_dir }}/coturn-debian-{{ turn_source_version }}"
+        remote_src: true
+    - debug:
+        msg: "configure_command: {{ turn_source_configure_command }}"
+    - name: "[turn source] Run configure script."
+      command: >
+        {{ turn_source_configure_command }}
+        chdir="{{ turn_source_clone_dir }}/coturn-debian-{{ turn_source_version }}"
+# #      when: php_installed.rc != 0
+
+    - name: "[turn source] Run make script."
+      command: >
+        {{ turn_source_make_command }}
+        chdir="{{ turn_source_clone_dir }}/coturn-debian-{{ turn_source_version }}"
+  when: 
+    - not coturn_binary_is_installed.stat.exists | bool
+    - coturn_is_installed.rc != 0
+
+- name: "[turn source] Copy the coturn systemd service file"
+  template:
+    src: coturn.service.j2
+    dest: /etc/systemd/system/coturn.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart turnserver
+- name: "[turn] Copy configuration in places."
+  template:
+    src: "{{ turn_template }}"
+    dest: "{{ turn_source_conf_dir }}/turnserver.conf"
+    mode: 0644
+  notify: restart turnserver
+
+- name: Ensure coturn is enabled on boot
+  become: true
+  systemd:
+    daemon_reload: true
+    name: coturn
+    enabled: true
+    state: started

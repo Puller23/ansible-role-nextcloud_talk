@@ -1,0 +1,107 @@
+---
+# Credentials for HPB Download
+hpb_customer_id: ""
+hpb_apt_key: "https://packages.struktur.de/nextcloud/spreed/{{ hpb_customer_id }}/struktur-ag-deb-sign-1.pub"
+hpb_repo: "deb [arch=amd64] https://packages.struktur.de/nextcloud/spreed/{{ hpb_customer_id }}/ubuntu focal main"
+
+
+hpb_proxy: false
+hpb_signaling: false
+hpb_turnserver: false
+# nginx
+nginx_ssl_folder: "/etc/nginx/ssl"
+nginx_ssl_cn: "test.hallo.de"
+nginx_template: "nginx_default.j2"
+nginx_sites_available_path: "/etc/nginx/sites-available"
+nginx_site_conf_filename: "default"
+
+nginx_service: nginx
+nginx_restart_state: restarted
+
+# Signaling
+nextcloud_spreed_signaling_conf_path: "/etc/nextcloud-spreed-signaling"
+nextcloud_spreed_signaling_conf_filename: "server.conf.spreed"
+nextcloud_spreed_signaling_template: server.conf.spreed.j2
+
+nextcloud_spreed_signaling_nginx_template: signaling_nginx_default.j2
+
+nextcloud_spreed_signaling_opennssl_public_key: server.pub
+nextcloud_spreed_signaling_opennssl_private_key: server.key
+nextcloud_spreed_signaling_opennssl_keysize: 2048
+
+nextcloud_spreed_signaling_service: nextcloud-spreed-signaling
+nextcloud_spreed_signaling_restart_state: restarted
+
+# http listener
+http_listener_enabled: true
+http_listener_ip: "127.0.0.1"
+http_listener_port: 8088
+http_listener_readtimeout: 15
+http_listener_writetimeout: 15
+
+# http listener
+https_listener_enabled: false
+https_listener_ip: "127.0.0.1"
+https_listener_port: 8443
+https_listener_readtimeout: 15
+https_listener_writetimeout: 15
+https_listener_certificate: "/etc/nginx/ssl/server.crt"
+https_listener_key: "/etc/nginx/ssl/server.key"
+
+# mcu
+mcu_maxscreenbitrate: 2097152
+muc_maxstreambitrate: 1048576
+
+# Webrtc
+nc_spreed_proxy_template: proxy.conf.spreed.j2
+nc_spreed_proxy_conf_path: "/etc/nextcloud-spreed-signaling"
+nc_spreed_proxy_conf_filename: "proxy.conf.spreed"
+
+nc_spreed_proxy_service: nextcloud-spreed-signaling-proxy
+nc_spreed_proxy_restart_state: restarted
+
+nc_spreed_proxy_nginx_template: proxy_nginx_default.j2
+nc_spreed_proxy_http_listener_enabled: true
+nc_spreed_proxy_http_listener_ip: "127.0.0.1"
+nc_spreed_proxy_http_listener_port: 9088
+nc_spreed_proxy_http_listener_readtimeout: 15
+nc_spreed_proxy_http_listener_writetimeout: 15
+
+nc_spreed_proxy_tokentype: static #static / etcd
+
+# Turnserver
+turn_listening_port: 60001
+turn_tls_listening_port: 5349
+turn_tls_cert: ""
+turn_tls_pkey: ""
+turn_static_auth_secret: ""
+turn_realm: "example.com"
+turn_total_quota: 0
+turn_bps_capacity: 0
+turn_stale-nonce: true
+turn_no_loopback_peers: true
+turn_no_multicast_peers: true
+turn_listening_device: ""
+turn_template: turnserver.conf.j2
+turn_config: /etc/turnserver.conf
+turn_service: coturn
+turn_service_restart_state: restarted
+turn_listening_ip: []
+# - "123.123.123.123"
+# - "234.234.234.234"
+turn_prometheus: true
+
+turn_extra_parameters: []
+#    - no-tls
+#    - min-port=20000
+#    - max-port=30000
+# Janus
+janus_config: /etc/janus/janus.jcfg.spreed
+janus_template: janus.jcfg.j2
+janus_stun_server: example.com
+janus_stun_server_port: 3478
+janus_service: janus
+janus_restart_state: restarted
+janus_rtp_port_range: "20000-40000"
+janus_certificates_cert_pem: "/etc/janus/janus.crt"
+janus_certificates_cert_key: "/etc/janus/janus.key"

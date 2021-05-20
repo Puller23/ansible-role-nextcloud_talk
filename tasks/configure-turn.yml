@@ -1,0 +1,7 @@
+---
+- name: "[turn] Copy configuration in places."
+  template:
+    src: "{{ turn_template }}"
+    dest: "{{ turn_config }}"
+    mode: 0644
+  notify: restart turnserver

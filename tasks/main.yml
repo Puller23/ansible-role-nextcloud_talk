@@ -1,0 +1,61 @@
+---
+  # - name: install signaling-server
+  #   import_tasks: install-signaling.yml
+  #   tags:
+  #     - signaling
+  #     - signaling-install
+  #   #when: "'signaling' in inventory_hostname"
+  #   when: hpb_signaling
+
+  # - name: configure signaling-server
+  #   import_tasks: configure-signaling.yml
+  #   tags:
+  #     - signaling
+  #     - signaling-configure
+  #   when: hpb_signaling
+
+  # - name: install webrtc-server
+  #   import_tasks: install-webrtc.yml
+  #   tags:
+  #     - webrtc
+  #     - webrtc-install
+  #   when: hpb_proxy
+
+  # - name: configure webrtc-server
+  #   import_tasks: configure-webrtc.yml
+  #   tags:
+  #     - webrtc
+  #     - webrtc-configure
+  #   when: hpb_proxy
+
+  - name: install turnserver
+    import_tasks: install-turn.yml
+    tags:
+      - turn
+      - turn-install
+    when: 
+      - hpb_turnserver
+      - not turn_install_from_source | bool
+
+  - name: install turnserver
+    import_tasks: install-turn-source.yml
+    tags:
+      - turn
+      - turn-install
+    when: 
+      - hpb_turnserver 
+      - turn_install_from_source | bool
+
+  # - name: configure turnserver
+  #   import_tasks: configure-turn.yml
+  #   tags:
+  #     - turn
+  #     - turn-configure
+  #   when: hpb_turnserver
+
+  # - name: configure janus
+  #   import_tasks: configure-janus.yml
+  #   tags:
+  #     - janus
+  #     - janus-configure
+  #   when: hpb_proxy

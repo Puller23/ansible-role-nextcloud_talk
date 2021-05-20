@@ -1,0 +1,7 @@
+---
+- name: "[janus] Copy configuration in place."
+  template:
+    src: "{{ janus_template }}"
+    dest: "{{ janus_config }}"
+    mode: 0644
+  notify: restart janus
